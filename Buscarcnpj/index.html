@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar CNPJ (CORS Anywhere)</title>
+</head>
+<body>
+    <main>
+        <h1>Buscar CNPJ</h1>
+        <input type="text" minlength="14" maxlength="14" placeholder="CNPJ" id="cnpj">
+        <button onclick="Send()">Enviar</button>
+        <div id="result"></div>
+    </main>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+        const corsAnywhereURL = 'https://cors-anywhere.herokuapp.com/';
+
+        async function Send() {
+            const cnpj = document.getElementById('cnpj').value;
+            if (!cnpj) {
+                resultDiv.textContent = 'Por favor, insira um CNPJ.';
+                return;
+            }
+
+            try {
+                const url = `${corsAnywhereURL}https://receitaws.com.br/v1/cnpj/${cnpj}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data);
+                resultDiv.innerHTML=`<ul>
+                        <li><p><Strong>Nome: </Strong>${data.nome}</p></li>
+                        <li><p><Strong>Abertura: </Strong>${data.abertura}</p></li>
+                        <li><p><Strong>Tipo: </Strong>${data.tipo}</p></li>
+                        <li><p><Strong>Atividade Principal: </Strong>${data.atividade_principal[0].text}</p></li>
+                    </ul>`
+            } catch (error) {
+                console.error('Erro:', error);
+                resultDiv.textContent = `Erro ao buscar CNPJ: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
