@@ -90,22 +90,23 @@
                 return;
             }
             
-                try {
-                    const url = `${corsAnywhereURL}https://receitaws.com.br/v1/cnpj/${cnpj}`;
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP! Status: ${response.status}`);
-                    }
-                    console.log(data);
-                    
-                    const data = await response.json();
-                    resultDiv.innerHTML=`<ul>
-                            <li><p><Strong>Nome: </Strong>${data.nome}</p></li>
-                            <li><p><Strong>Abertura: </Strong>${data.abertura}</p></li>
-                            <li><p><Strong>Tipo: </Strong>${data.tipo}</p></li>
-                            <li><p><Strong>Atividade Principal: </Strong>${data.atividade_principal[0].text}</p></li>
-                        </ul>`
+            try {
+                        const url = `${corsAnywhereURL}https://receitaws.com.br/v1/cnpj/${cnpj}`;
+                        const response = await fetch(url);
+
+                            if (!response.ok) {
+                            throw new Error(`Erro HTTP! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            console.log(data); 
+
+                            resultDiv.innerHTML = `<ul>
+                            <li><p><strong>Nome: </strong>${data.nome}</p></li>
+                            <li><p><strong>Abertura: </strong>${data.abertura}</p></li>
+                            <li><p><strong>Tipo: </strong>${data.tipo}</p></li>
+                            <li><p><strong>Atividade Principal: </strong>${data.atividade_principal[0].text}</p></li>
+                        </ul>`;
                 } catch (error) {
                     console.error('Erro:', error);
                     if(error = 429 ){
