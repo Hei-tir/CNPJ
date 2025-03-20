@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar CNPJ (CORS Anywhere)</title>
+    <style>
+        html{
+            padding: 0px;
+            margin: 0px;
+            background-color: whitesmoke;
+        }
+        
+        main{        
+            margin: 0;    
+        }
+        .centerbox{
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+        }
+        .box{
+            background-color: antiquewhite;
+            padding: 100px;
+            border-radius: 30px;
+            box-shadow: 1px 3px 4px gray;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="centerbox">
+            <div class="box">
+                <h1>Buscar CNPJ</h1>
+                <input type="text" min placeholder="CNPJ" id="cnpj">
+                <button onclick="Send()">Enviar</button>
+                <div id="result"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+        const corsAnywhereURL = 'https://cors-anywhere.herokuapp.com/';
+        async function Send() {
+            var cnpj = document.getElementById('cnpj').value;
+            cnpj = cnpj.replace(/[^\d]+/g, '');
+            if (!cnpj) {
+                resultDiv.textContent = 'Por favor, insira um CNPJ.';
+                return;
+            }
+            if (cnpj.length != 14){
+                resultDiv.textContent = 'O Cnpj contem menos ou mais de 14 digitos';
+                return;
+            }
+            if (/^(\d)\1+$/.test(cnpj)){
+                resultDiv.textContent = 'O Cnpj é invalido tente novamente';
+                return;
+            }
+            let tamanho = cnpj.length -2;
+            let numeros = cnpj.substring(0,tamanho)
+            let digitos = cnpj.substring(tamanho)
+            let soma = 0;
+            let pos = tamanho-7;
+            for(let i= tamanho; i>=1; i--){
+                soma += numeros.charAt(tamanho - i) * pos--;
+                if(pos<2){
+                    pos = 9;
+                }
+            }
+            let resultado = soma % 11<2?0: 11 - soma % 11;
+
+            if (resultado !=digitos.charAt(0)){
+                resultDiv.textContent ='Cnjp Invalido tente novamente';
+                return;
+            }
+            tamanho = tamanho+1;
+            numeros = cnpj.substring(0,tamanho);
+            soma = 0;
+            pos = tamanho-7;
+            for(let i= tamanho; i>=1; i--){
+                soma+= numeros.charAt(tamanho-i) * pos--;
+                if(pos<2){
+                    pos = 9;
+                }
+            }
+            resultado = soma % 11 < 2 ? 0 :11 - soma % 11;
+            if(resultado!= digitos.charAt(1)){
+                resultDiv.textContent ='Cnjp Invalido tente novamente';
+                return;
+            }
+            
+                try {
+                    const url = `${corsAnywhereURL}https://receitaws.com.br/v1/cnpj/${cnpj}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP! Status: ${response.status}`);
+                    }
+                    console.log(data);
+                    
+                    const data = await response.json();
+                    resultDiv.innerHTML=`<ul>
+                            <li><p><Strong>Nome: </Strong>${data.nome}</p></li>
+                            <li><p><Strong>Abertura: </Strong>${data.abertura}</p></li>
+                            <li><p><Strong>Tipo: </Strong>${data.tipo}</p></li>
+                            <li><p><Strong>Atividade Principal: </Strong>${data.atividade_principal[0].text}</p></li>
+                        </ul>`
+                } catch (error) {
+                    console.error('Erro:', error);
+                    if(error = 429 ){
+                        resultDiv.textContent ='Muitos requerimentos aguarde 1 minuto';
+                    }
+                }
+            }
+            
+    </script>
+</body>
+</html>
